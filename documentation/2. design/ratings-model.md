@@ -1,29 +1,82 @@
-# Ratings model — working draft
+# Ratings model
 
-Nothing on this page is decided beyond requirements decisions #1–#9.
+What requirements decisions #1–#17 add up to. RT-Q8 and RT-Q9 are the only
+open points and are marked where they bite.
 
 ## Objects
 
 ```
-rating      rater: raw key   item: raw key   value: float   at: timestamp
-similarity  a: raw key       b: raw key      metric: enum   score: float in (0, 1]   at: timestamp
+rating      rater: raw key   item: raw key   value: float in [0, 1]   at: timestamp
+            one row per (rater, item); a repeat replaces it                 (#10, #11)
+similarity  a: raw key       b: raw key      kind: rater | item   metric: enum
+            score: float in (0, 1]   overlap: int   at: timestamp
+            at most K rows per (a, kind); overlap ≥ 3                        (#13, #14)
 ```
 
 Both keys are raw strings in the standard's form, `<module>/<instance>/<identity>`,
-owned by other modules. This module never resolves them.
+owned by other modules. This module never resolves them (#4, #16). The host
+normalises the value onto [0, 1] before it arrives; the module refuses anything
+outside.
 
-## Similarity, incrementally (decision #5)
+### Blueprint sketch
+
+```json
+{
+  "module": "ratings",
+  "objects": [
+    { "role": "rating", "fields": [
+      { "name": "rater", "type": "string", "required": true },
+      { "name": "item",  "type": "string", "required": true },
+      { "name": "value", "type": "float",  "required": true },
+      { "name": "at",    "type": "timestamp", "required": true } ],
+      "indexes": [ { "fields": ["rater", "item"], "unique": true },
+                   { "fields": ["item"] } ] },
+    { "role": "similarity", "fields": [
+      { "name": "a",       "type": "string", "required": true },
+      { "name": "b",       "type": "string", "required": true },
+      { "name": "kind",    "type": "enum", "values": ["rater", "item"], "required": true },
+      { "name": "metric",  "type": "enum", "values": ["euclidean", "cosine", "jaccard"], "required": true },
+      { "name": "score",   "type": "float", "required": true },
+      { "name": "overlap", "type": "int",   "required": true },
+      { "name": "at",      "type": "timestamp", "required": true } ],
+      "indexes": [ { "fields": ["a", "kind", "b"], "unique": true },
+                   { "fields": ["a", "kind", "score"] } ] }
+  ]
+}
+```
+
+The `[0, 1]` bound on `value` is a rule the spec cannot state, so it stays in
+Go beside the type, the way every sibling keeps what a declaration cannot say.
+
+### A domain spec names, it does not re-declare
+
+```json
+{ "module": "ratings", "domain": "titles", "instance": "cat1",
+  "objects": [ { "role": "rating", "name": "review" },
+               { "role": "similarity", "name": "affinity" } ],
+  "settings": { "metric": "euclidean", "similarities": ["rater"], "k": 30, "overlap": 3 } }
+```
+
+Two ship under `spec/examples/`: a catalog of titles, and a household rating
+recipes — far enough apart that a domain word in the module would show.
+Whether `settings` is a spec field or a separate per-instance object is RT3's
+to settle against what `spec` allows a domain to carry.
+
+## Similarity, incrementally (decisions #5, #12–#14)
 
 When rater `r` writes a rating for item `i`:
 
 1. find the raters who also rated `i` — the only raters whose similarity to
    `r` can have changed;
-2. for each such `s`, take the items both rated and compute the declared
-   metric over the two value vectors;
-3. upsert `similarity(r, s)` and `similarity(s, r)`.
+2. for each such `s`, take the items both rated; if fewer than the overlap
+   floor, skip; else compute the declared metric over the two value vectors;
+3. for each of `(r, s)` and `(s, r)`: if a row exists, write the new score;
+   else if fewer than K rows exist for that side, insert; else if the score
+   beats that side's K-th, insert and delete the K-th.
 
-The work is bounded by one item's raters, not by the catalog. Item-to-item is
-the same three steps with rater and item swapped.
+The work is bounded by one item's raters and by K, never by the catalog.
+Item-to-item, when the instance declares it, is the same three steps with
+rater and item swapped, keyed on the item's raters.
 
 | Metric | Over co-rated items | Score |
 |--------|---------------------|-------|
@@ -31,17 +84,21 @@ the same three steps with rater and item swapped.
 | `cosine` | `Σ v_r·v_s / (‖v_r‖·‖v_s‖)` | the cosine itself, clamped to [0, 1] |
 | `jaccard` | `|both rated| / |either rated|` — ignores values, for thumbs-only scales | the ratio |
 
-## The contract with `mwanachama-backend-context` (decision #8)
+## The contract with `mwanachama-backend-context` (decisions #8, #15)
 
 ```
-context.reindex(partition, "ratings", [rater keys])
-  → this module, as extractor, appends:
-      similar_taste  a ── b   weight = score   source = extractor:ratings
+context.reindex(partition, "ratings", [keys])
+  → this module, as extractor, appends for each key:
+      similar_taste  a ── b   weight = score   source = extractor:ratings      always
+      rated          r ──▶ i  weight = value   source = extractor:ratings      only if the host
+                                                                             declared `rated`
 ```
 
 `similar_taste` is declared by the host in its `context.<domain>.json`; this
-module supplies the edges, context supplies the walk. Whether `rated` edges
-travel too is RT-Q6.
+module supplies the edges, context supplies the walk. The module exposes one
+library call for it, `Edges(ctx, partition, keys) ([]Edge, error)`, which the
+host's reindex adapter calls; it is not a declared operation. Who triggers the
+reindex after a write, and how often, is RT-Q9.
 
 ## `recommend(rater, n)` without the graph (decision #9)
 
@@ -55,4 +112,20 @@ order by predicted desc
 limit  :n
 ```
 
-One query over the top-K neighbours (RT-Q4). The graph is not involved.
+One query over the K stored neighbours. The graph is not involved. A rater
+with no neighbours gets an empty list today; whether a popularity fallback
+belongs here is RT-Q8.
+
+## The surface (decision #17)
+
+| Action | Method and path | Who |
+|--------|-----------------|-----|
+| `ratings.rating.put` | `PUT /ratings/{item}` — rater from the caller, value in the body | any member |
+| `ratings.rating.list` | `GET /ratings?rater=…` or `?item=…` | any member |
+| `ratings.rating.delete` | `DELETE /ratings/{item}` — the caller's own | any member |
+| `ratings.similarity.list` | `GET /similar/{key}?kind=rater\|item` | any member |
+| `ratings.recommend` | `GET /recommend?n=…` — for the caller | any member |
+
+All five come from `ratings.operations.json` through `dispatch`, so the MCP
+tools (`ratings_rating_put`, …) are the same table. `AnonymousActions` is
+empty. The host maps its caller to a rater key; a body never names the rater.
