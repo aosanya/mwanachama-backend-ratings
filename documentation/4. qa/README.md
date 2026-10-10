@@ -9,12 +9,16 @@ go test ./...        # in-memory SQLite (glebarez/sqlite), no database needed
 make test-pg         # -tags=integration, with POSTGRES_URL set
 ```
 
-## What will be measured (RT5)
+## What will be measured (RT2, run by RT10)
 
-Hold out one rating per rater from a public rating set, predict it through
-`recommend`'s formula, and score **RMSE** on the prediction and **recall@N**
-on the recommended list. The same run chooses the metric, the neighbourhood
-size K (RT-Q4) and the overlap floor (RT-Q5), so none of those is a guess.
+Hold out each rater's latest rating from MovieLens ml-100k, predict it through
+`recommend`'s formula, and score **RMSE**, **MAE** and **coverage** on the
+prediction and **hit rate @10** on the recommended list. The same run chooses
+the metric (#6), the neighbourhood size K (#13) and the overlap floor (#14),
+so none of those is a guess. The step list is
+[measurement-procedure.md](measurement-procedure.md); the reasoning is
+[`2. design/measurement.md`](../2.%20design/measurement.md); the numbers will
+land in `measurements.md`.
 
 ## What will be pinned, when the code exists
 

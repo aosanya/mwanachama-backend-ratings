@@ -15,9 +15,7 @@ rests on is in `requirements.md`; a row names the ones it carries.
 
 ## Research
 
-| Task | Title | Notes |
-|------|-------|-------|
-| RT2 | 📋 **Define how recommendation quality is measured** | Hold out one rating per rater from a public rating set, predict it, score RMSE and recall@N. The same run sets the metric, K (#13) and the overlap floor (#14) from evidence. Output: `2. design/measurement.md` and the `4. qa/` procedure. |
+None open. RT1 and RT2 are in `todo_done.md`.
 
 ## Build
 
@@ -30,5 +28,5 @@ rests on is in `requirements.md`; a row names the ones it carries.
 | RT7 | 📋 **`ratings.operations.json`, `routes/`, MCP tools** | RT6 | #17: five operations through `dispatch`; rater bound from the caller; `AnonymousActions` empty; `TestNoRouteIsAnonymous`. |
 | RT8 | 📋 **`Edges(ctx, partition, keys)` — the extractor toward context** | RT5, context's TR13, shared's S59 | #8, #15: `similar_taste` always, `rated` only when the host declared it. Blocked on the write-report shape (S59) and on context existing to receive it. The host calls it, batched (#18). |
 | RT9 | 📋 **`Provision`, `cmd/ddl`, `Makefile`, `postgres_integration_test.go`** | RT3 | `spec.Migrate` is the whole storage story; `//go:build integration` gated on `POSTGRES_URL`; `build`/`test`/`test-pg`/`vet`/`clean`. |
-| RT10 | 📋 **Measure against a public rating set** | RT2, RT6 | Load the set through `put`, run RT2's procedure, record the numbers in `4. qa/`, and set the defaults for metric, K and overlap from them. |
+| RT10 | 📋 **Measure against a public rating set** | RT2, RT6 | Load the set through `put`, run RT2's procedure (`4. qa/measurement-procedure.md`), record the numbers in `4. qa/measurements.md`, and set the defaults for metric, K and overlap from them. Needs the owner: the routine's environment cannot reach `files.grouplens.org` (egress policy, confirmed 2026-10-10), so the ml-100k archive has to be placed by hand or the policy widened before this row can run unattended. |
 | RT11 | ⏸️ **Mount in `mwanachama-wakala-api`** | RT7, RT8 | Cross-repo. `RATINGS_INSTANCE` → `SpecFor`, provisioned on boot, mounted beside the other declared domains per that repo's decision #22; the caller→rater mapping; the batched reindex trigger toward context (#18): per-pod pending set, flush at ~30 s or N raters. |
