@@ -49,6 +49,8 @@ say so and the row is struck through.
 
 | 18 | **This module triggers nothing and depends on nothing but `mwanachama-backend-shared`.** It has no connection to ArangoDB, no import of `mwanachama-backend-context`, and no knowledge that a graph exists; it exposes `Edges(ctx, partition, keys)` and that is the whole relationship. The host — `mwanachama-wakala-api` — owns the reindex: its context adapter notes the rater key after each rating write and flushes `reindex(partition, "ratings", [raters])` on the earlier of a short delay (~30 s) or N pending raters. The pending set is per-pod memory: a reindex is append-only and idempotent, so two pods flushing the same rater cost one spare write and nothing else. Ten ratings in a minute become one reindex; the graph is at most half a minute behind. (RT-Q9, 2026-10-10) |
 
+| 19 | **`recommend` returns what similarity supports and nothing else.** A rater with no neighbours gets an empty list; the fallback for a newcomer — "most rated this month" — is the host's to compose from the catalog or elsewhere. One notion of "good" per operation. If a host ever needs a popularity list from the data already here, it is a separate declared read, `ratings.popular`, filed then and not before. (RT-Q8, 2026-10-10) |
+
 ## Open questions for the owner
 
 Answered — struck through — or still open.
@@ -61,11 +63,8 @@ Answered — struck through — or still open.
 | ~~RT-Q4~~ | **How many neighbours are kept per rater** — the top K by score (K ≈ 20–50), or every co-rater? | All pairs over co-raters is still quadratic in a dense catalog; top-K bounds storage and every later query. |
 | ~~RT-Q5~~ | **Minimum overlap** — how many co-rated items before a similarity counts? Two raters sharing one item have a perfect, meaningless score. | A floor of 2–3 is the usual answer; it is a number for measurement, not a guess. |
 | ~~RT-Q6~~ | **Does it also emit `rated` edges to context**, rater → item with the value as weight, or only `similar_taste`? | With `rated` edges the graph can walk rater → similar rater → item; without them the graph knows taste but not what anyone rated, and `recommend` stays SQL-only. |
+| ~~RT-Q8~~ | **Cold start.** A rater with no ratings, or an item nobody has rated, has no neighbours. Does `recommend` fall back, return nothing, or is that the host's problem? | Answered by #19: empty, the host composes a fallback. |
+| ~~RT-Q9~~ | **Who triggers the context reindex** after a rating write, and how often? | Answered by #18: the host, batched per pod. |
 | ~~RT-Q7~~ | **Who owns the rater and item keys toward context** — must the raters' owner (accounts, actor) and the items' owner (catalog) implement `StableIdentity`/`Resolve` for a `similar_taste` edge's ends to be fetchable, and does this module implement them for `rating` rows at all? | Context fills `object`/`id` into walk results through the owners (its #56); this module is not the owner of either end. |
 
-Still open:
-
-| # | Question | Why it matters |
-|---|----------|----------------|
-| RT-Q8 | **Cold start.** A rater with no ratings, or an item nobody has rated, has no neighbours. Does `recommend` fall back to the instance's most-rated items, return nothing, or is that the host's problem? | Every new rater hits this on day one; a fallback is a popularity list the module could compute cheaply, but it is a second notion of "good" beside similarity. |
-| ~~RT-Q9~~ | **Who triggers the context reindex** after a rating write — this module, by calling the host's hook, or the host, which already triggers `context.reindex` after writes it knows about (context's #25)? | Ratings writes are many and small; a reindex per write may be too chatty, and a batch rule (every N writes, or every few minutes) is a decision. |
+Still open: none. Every question raised so far is answered above.

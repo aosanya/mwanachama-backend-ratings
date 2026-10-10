@@ -115,8 +115,8 @@ limit  :n
 ```
 
 One query over the K stored neighbours. The graph is not involved. A rater
-with no neighbours gets an empty list today; whether a popularity fallback
-belongs here is RT-Q8.
+with no neighbours gets an empty list; a newcomer's fallback is the host's to
+compose (#19).
 
 ## The surface (decision #17)
 
