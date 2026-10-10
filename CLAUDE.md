@@ -35,7 +35,10 @@ come before any code. Do not resolve an open question by guessing; ask.
 - **The metric is declared**, from a closed set the module supplies:
   `euclidean` (asked for first), `cosine`, `jaccard`.
 - **Toward `mwanachama-backend-context` it is an extractor**: on that
-  module's `reindex` it emits `similar_taste` edges with `weight = score`.
+  module's `reindex` it emits `similar_taste` edges with `weight = score`,
+  through one library call, `Edges`. It imports nothing from context, never
+  touches ArangoDB, and triggers nothing — the host batches and calls the
+  reindex (requirements #18).
 - **It names no domain.** Not "movie", not "member", not "user" — `rater`
   and `item`. A `domain_agnostic_test.go` will enforce it over identifiers,
   the blueprint and every stored enum value, as the siblings do.

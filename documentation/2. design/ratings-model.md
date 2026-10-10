@@ -97,8 +97,10 @@ context.reindex(partition, "ratings", [keys])
 `similar_taste` is declared by the host in its `context.<domain>.json`; this
 module supplies the edges, context supplies the walk. The module exposes one
 library call for it, `Edges(ctx, partition, keys) ([]Edge, error)`, which the
-host's reindex adapter calls; it is not a declared operation. Who triggers the
-reindex after a write, and how often, is RT-Q9.
+host's reindex adapter calls; it is not a declared operation. The host batches
+rater keys after writes and flushes a reindex every ~30 s or N raters, from
+per-pod memory — safe because a reindex is idempotent (#18). This module has
+no connection to ArangoDB and no import of context.
 
 ## `recommend(rater, n)` without the graph (decision #9)
 
