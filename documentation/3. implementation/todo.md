@@ -2,6 +2,14 @@
 
 Open tasks only — 🚀 In Progress · 📋 Not Started · ⏸️ Blocked.
 
+A routine, **Context & ratings backlog** (`trig_0167WRNiqZHBkPb9NVLBx95T`,
+every 6 hours from 2026-10-10), works this board and `mwanachama-backend-context`'
+unattended: research rows first, then build rows in dependency order, on
+`main`, never a branch. It does not decide an owner question — a row that
+needs one gets a "Needs the owner:" note and stays open — and it does not
+start RT11 until the module exists and shared's S59 lands. Finished rows move
+to `todo_done.md` with the real test output.
+
 Research first, then the build in dependency order. Every decision the build
 rests on is in `requirements.md`; a row names the ones it carries.
 
