@@ -1,0 +1,25 @@
+{
+  "module": "ratings",
+  "domain": "pantry",
+  "instance": "home1",
+  "objects": [
+    {
+      "role": "rating",
+      "name": "verdict",
+      "table": "verdicts",
+      "description": "A thumbs up or down from one person at the table on one recipe, stored as 1 or 0."
+    },
+    {
+      "role": "similarity",
+      "name": "kinship",
+      "table": "kinships",
+      "description": "Two people at the table who like the same dishes, or two recipes liked by the same people."
+    },
+    {
+      "role": "setting",
+      "name": "preference",
+      "table": "preferences",
+      "description": "The household's choice of metric, which is jaccard because a thumb carries no grade."
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 # Design
 
-Nothing is built. This folder records the shape the requirements add up to.
+This folder records the shape the requirements add up to; RT3 built the
+objects and the manager constructor against it on 2026-10-10.
 
 | Page | What it holds |
 |------|---------------|

@@ -9,11 +9,40 @@ at)`; a `similarity` is `(a, b, metric, score, at)`, computed from co-rated
 items by a declared metric. Module path
 `github.com/aosanya/mwanachama-backend-ratings`.
 
-**This repo is in research.** Nothing is built. The decisions are on
-[documentation/1. requirements/requirements.md](documentation/1.%20requirements/requirements.md),
-the open questions beneath them, and the research rows on
+**The research rows are done and the build has started.** The decisions are
+on
+[documentation/1. requirements/requirements.md](documentation/1.%20requirements/requirements.md)
+and are settled; the build rows on
 [documentation/3. implementation/todo.md](documentation/3.%20implementation/todo.md)
-come before any code. Do not resolve an open question by guessing; ask.
+run in dependency order. Do not resolve an open question by guessing; ask.
+
+## What is built (RT3, 2026-10-10)
+
+- `ratings.blueprint.json` declares three roles — `rating`, `similarity`,
+  `setting` — embedded and reached through `Blueprint()`, `LoadSpec(path)`
+  and `ParseSpec(raw)`. Load a domain spec through those, never `spec.Load`.
+- `spec/examples/titles.ratings.json` (a catalogue of titles, instance
+  `cat1`) and `pantry.ratings.json` (a household rating recipes, instance
+  `home1`) are the same module under two domains far enough apart that a
+  domain word in the module would show. `TestShippedExamplesCoexist`
+  migrates both into one database; `TestEveryExampleFitsTheTypes` builds a
+  manager over each.
+- `models/` carries `Rating`, `Similarity`, `Setting`, `Kind` and `Metric`,
+  checked against the blueprint in `NewRatingsManager(db, *spec.Spec)` by
+  `specstore.New`. `TestVocabularyMatchesTheBlueprint` holds the Go
+  constants and the blueprint's enum values to each other.
+- **Per-instance settings are rows, not a spec block.** `spec.Spec` decodes
+  with unknown fields refused, so the `settings` sketch on the design page
+  could not be carried by a domain spec. The third role, `setting`, is a
+  key/value table the host writes on boot; `Settings(ctx)` merges its rows
+  over `DefaultSettings()` (euclidean, rater-to-rater only, K 30, overlap
+  3), and `PutSetting` holds `metric` and `similarities` to the blueprint's
+  own enum values and `k`/`overlap` to whole numbers of at least 1. See
+  [documentation/2. design/ratings-model.md](documentation/2.%20design/ratings-model.md).
+- `domain_agnostic_test.go` parses `models/`, `routes/` and the root
+  package, every stored vocabulary and the blueprint, and fails on a domain
+  word. The words include both example domains' nouns (`title`, `review`,
+  `recipe`, `verdict`), so the examples are what would catch a leak.
 
 ## What is already known
 
@@ -40,16 +69,17 @@ come before any code. Do not resolve an open question by guessing; ask.
   touches ArangoDB, and triggers nothing — the host batches and calls the
   reindex (requirements #18).
 - **It names no domain.** Not "movie", not "member", not "user" — `rater`
-  and `item`. A `domain_agnostic_test.go` will enforce it over identifiers,
-  the blueprint and every stored enum value, as the siblings do.
+  and `item`. `domain_agnostic_test.go` enforces it over identifiers, the
+  blueprint and every stored enum value, as the siblings do.
 
 ## Conventions
 
 - Four-phase `documentation/` layout — see
   [documentation/README.md](documentation/README.md).
-- `go test ./...` (sqlite via `glebarez/sqlite`) will verify a change here;
+- `go test ./...` (sqlite via `glebarez/sqlite`) verifies a change here;
   what sqlite cannot stand in for goes under `//go:build integration`, gated
-  on `POSTGRES_URL`, run by `make test-pg`.
+  on `POSTGRES_URL`, run by `make test-pg`. `make build`, `make vet` and
+  `gofmt -l .` are the rest of the pre-push check.
 - No Go file over 300 lines; split by responsibility.
 
 ## Code comments

@@ -1,0 +1,25 @@
+{
+  "module": "ratings",
+  "domain": "titles",
+  "instance": "cat1",
+  "objects": [
+    {
+      "role": "rating",
+      "name": "review",
+      "table": "reviews",
+      "description": "A reader's star rating of one title in the catalogue, normalised onto the module's scale."
+    },
+    {
+      "role": "similarity",
+      "name": "affinity",
+      "table": "affinities",
+      "description": "Two readers with alike taste, or two titles liked by the same readers."
+    },
+    {
+      "role": "setting",
+      "name": "setting",
+      "table": "settings",
+      "description": "The catalogue's choice of metric, neighbourhood size and overlap floor."
+    }
+  ]
+}

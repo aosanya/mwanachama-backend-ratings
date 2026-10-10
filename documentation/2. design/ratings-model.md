@@ -52,15 +52,38 @@ Go beside the type, the way every sibling keeps what a declaration cannot say.
 
 ```json
 { "module": "ratings", "domain": "titles", "instance": "cat1",
-  "objects": [ { "role": "rating", "name": "review" },
-               { "role": "similarity", "name": "affinity" } ],
-  "settings": { "metric": "euclidean", "similarities": ["rater"], "k": 30, "overlap": 3 } }
+  "objects": [ { "role": "rating",     "name": "review",   "table": "reviews" },
+               { "role": "similarity", "name": "affinity", "table": "affinities" },
+               { "role": "setting",    "name": "setting",  "table": "settings" } ] }
 ```
 
-Two ship under `spec/examples/`: a catalog of titles, and a household rating
-recipes — far enough apart that a domain word in the module would show.
-Whether `settings` is a spec field or a separate per-instance object is RT3's
-to settle against what `spec` allows a domain to carry.
+Two ship under `spec/examples/`: a catalog of titles (`cat1`), and a
+household rating recipes (`home1`) — far enough apart that a domain word in
+the module would show. The shipped blueprint is `ratings.blueprint.json`; the
+sketch above it is what it was built from.
+
+### Where the per-instance settings live (settled by RT3, 2026-10-10)
+
+The first sketch put a `settings` block in the domain spec. `spec.Spec`
+decodes with unknown fields refused and a domain may set only a default on a
+declared field, so a spec cannot carry it, and the one field it could
+default — `similarity.metric` — is required at every write and may not
+carry a default. So the settings are a third declared role, `setting`: a
+key/value table the host writes on boot, the shape catalog already uses for
+its run-time knobs.
+
+| Key | Value | Default |
+|---|---|---|
+| `metric` | one of the blueprint's `similarity.metric` values | `euclidean` (#6) |
+| `similarities` | a comma-separated subset of `similarity.kind` | `rater` (#12) |
+| `k` | a whole number ≥ 1 | 30 (#13) |
+| `overlap` | a whole number ≥ 1 | 3 (#14) |
+
+`Settings(ctx)` merges the rows over the defaults; `PutSetting` refuses a
+value outside the blueprint's vocabulary or a count below 1 before anything
+is stored, reading the permitted values off the spec rather than from a
+second list in Go. A value a measurement changes (RT10) changes the default
+in Go and, where an instance differs, its row.
 
 ## Similarity, incrementally (decisions #5, #12–#14)
 

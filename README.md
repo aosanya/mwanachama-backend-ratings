@@ -10,6 +10,8 @@ It answers "what would this rater rate highly" on its own, by SQL, and feeds
 [mwanachama-backend-context](../mwanachama-backend-context) so a walk there
 can blend taste with everything else that graph holds.
 
-Research stage, split out of `mwanachama-backend-context` on 2026-10-10
-(its decision #61). Nothing is built; the decisions and the open questions
-are in [documentation/](documentation/README.md).
+Split out of `mwanachama-backend-context` on 2026-10-10 (its decision #61).
+The blueprint, two domain specs, the models and the manager constructor are
+built (RT3); the writes, the similarity step, `recommend` and the operations
+table follow in order on the board in
+[documentation/](documentation/README.md).
