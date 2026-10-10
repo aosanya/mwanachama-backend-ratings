@@ -17,7 +17,6 @@ rests on is in `requirements.md`; a row names the ones it carries.
 
 | Task | Title | Notes |
 |------|-------|-------|
-| RT1 | 📋 **Survey collaborative filtering as it applies here** | User-based vs item-based, the three metrics, neighbourhood size, overlap floors; what a Postgres-only implementation costs at 10⁴ raters × 10⁴ items. Output: one page in `2. design/` that gives RT2 its starting numbers. |
 | RT2 | 📋 **Define how recommendation quality is measured** | Hold out one rating per rater from a public rating set, predict it, score RMSE and recall@N. The same run sets the metric, K (#13) and the overlap floor (#14) from evidence. Output: `2. design/measurement.md` and the `4. qa/` procedure. |
 
 ## Build
