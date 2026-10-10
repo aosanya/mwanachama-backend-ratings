@@ -34,7 +34,11 @@ Since RT3:
 - one row per `(rater, item)` and per `(a, kind, b)` is the primary key
   (#11, #13) — `TestOneRowPerRaterAndItemIsTheKey`;
 - a setting is held to the blueprint's vocabulary and a refused put stores
-  nothing — `settings_test.go`.
+  nothing — `settings_test.go`;
+- `value` outside [0, 1], `score` outside (0, 1], a negative `overlap`, an
+  undeclared `kind` or `metric` and a missing required field are refused by
+  `Check`, and a kind a domain declares is accepted — `validate_test.go`
+  (RT4).
 
 Still to pin, with the rows that build them:
 

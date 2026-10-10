@@ -21,7 +21,6 @@ None open. RT1 and RT2 are in `todo_done.md`.
 
 | Task | Title | Depends on | Notes |
 |------|-------|------------|-------|
-| RT4 | 📋 **`validate.go` and the [0, 1] bound** | RT3 | `required` and enum `values` read off the spec; the value bound in Go beside the type. `Check(s, role, v)` without a database. |
 | RT5 | 📋 **Rating put / list / delete, and the incremental similarity step** | RT4 | #5, #11–#14: one row per `(rater, item)`, replaced on repeat; on every write the three-step computation over the item's raters with the overlap floor and top-K maintenance; item-to-item when the instance declares it. Mutation-checked: a write must touch only raters sharing that item. |
 | RT6 | 📋 **`recommend(rater, n)`** | RT5 | #9: the one query on the design page over the K neighbours, excluding the rater's own items. A rater with no neighbours gets an empty list (#19). |
 | RT7 | 📋 **`ratings.operations.json`, `routes/`, MCP tools** | RT6 | #17: five operations through `dispatch`; rater bound from the caller; `AnonymousActions` empty; `TestNoRouteIsAnonymous`. |

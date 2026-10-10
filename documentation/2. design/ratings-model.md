@@ -46,7 +46,9 @@ outside.
 ```
 
 The `[0, 1]` bound on `value` is a rule the spec cannot state, so it stays in
-Go beside the type, the way every sibling keeps what a declaration cannot say.
+Go beside the type, the way every sibling keeps what a declaration cannot say
+— `Rating.ValueInRange`, `Similarity.ScoreInRange` and `OverlapIsCount` in
+`models/`, applied by `validate.go` after the declared rules (RT4).
 
 ### A domain spec names, it does not re-declare
 

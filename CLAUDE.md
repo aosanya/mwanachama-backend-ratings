@@ -16,7 +16,7 @@ and are settled; the build rows on
 [documentation/3. implementation/todo.md](documentation/3.%20implementation/todo.md)
 run in dependency order. Do not resolve an open question by guessing; ask.
 
-## What is built (RT3, 2026-10-10)
+## What is built (RT3–RT4, 2026-10-10)
 
 - `ratings.blueprint.json` declares three roles — `rating`, `similarity`,
   `setting` — embedded and reached through `Blueprint()`, `LoadSpec(path)`
@@ -39,6 +39,15 @@ run in dependency order. Do not resolve an open question by guessing; ask.
   3), and `PutSetting` holds `metric` and `similarities` to the blueprint's
   own enum values and `k`/`overlap` to whole numbers of at least 1. See
   [documentation/2. design/ratings-model.md](documentation/2.%20design/ratings-model.md).
+- `validate.go` (RT4) reads `required`, an enum's `values` and `matches` off
+  the spec and applies them on the way in, so a domain that widens `kind`
+  gets the new value accepted with no Go change
+  (`TestVocabularyComesFromTheSpec`). What stays in Go is what a spec cannot
+  say — `value` in [0, 1], `score` in (0, 1], `overlap` a count — and each
+  lives beside its type in `models/`. `Check(spec, role, v)` is the same
+  validation without a database. `patterns.go` holds the `matches` registry,
+  empty until a field needs one; a spec naming a pattern nobody supplies is
+  an error, not a rule that quietly never runs.
 - `domain_agnostic_test.go` parses `models/`, `routes/` and the root
   package, every stored vocabulary and the blueprint, and fails on a domain
   word. The words include both example domains' nouns (`title`, `review`,
