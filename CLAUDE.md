@@ -83,6 +83,14 @@ run in dependency order. Do not resolve an open question by guessing; ask.
   self-join, top-K, `recommend` and the delete-below-floor path on real
   Postgres. Written, compiled under the tag, **not run**: the routine's
   environment has no Postgres.
+- `measure_*_test.go` (RT10's harness, 2026-10-11) runs RT2's protocol
+  under `//go:build measure`: `make measure` with `RATINGS_MEASURE_DIR`
+  naming the extracted ml-100k set loads every rating through `PutRating`
+  per grid cell and prints the grid, the baselines and the design page's
+  variant columns. Never part of `go test ./...`; proven on a synthetic set
+  only, because the environment the routine runs in cannot reach any host
+  that carries the data. See
+  [measurement-procedure.md](documentation/4.%20qa/measurement-procedure.md).
 - `domain_agnostic_test.go` parses `models/`, `routes/` and the root
   package, every stored vocabulary and the blueprint, and fails on a domain
   word. The words include both example domains' nouns (`title`, `review`,

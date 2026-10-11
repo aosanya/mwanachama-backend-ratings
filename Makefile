@@ -1,4 +1,4 @@
-.PHONY: build test test-pg vet clean
+.PHONY: build test test-pg measure vet clean
 
 build:
 	go build ./...
@@ -14,3 +14,6 @@ vet:
 
 clean:
 	rm -rf bin/
+
+measure:
+	go test -tags=measure -run TestMeasure -v -timeout 0 ./...
