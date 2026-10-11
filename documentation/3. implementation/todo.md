@@ -7,8 +7,11 @@ every 6 hours from 2026-10-10), works this board and `mwanachama-backend-context
 unattended: research rows first, then build rows in dependency order, on
 `main`, never a branch. It does not decide an owner question — a row that
 needs one gets a "Needs the owner:" note and stays open — and it does not
-start RT11 until the module exists and shared's S59 lands. Finished rows move
-to `todo_done.md` with the real test output.
+start RT11 until the module exists and shared's S59 lands. **Since
+2026-10-11 the routine builds shared's S56–S59 itself**, on
+`mwanachama-backend-shared`'s `master` directly (the owner's call; the rule
+is on that board's header). Finished rows move to `todo_done.md` with the
+real test output.
 
 Research first, then the build in dependency order. Every decision the build
 rests on is in `requirements.md`; a row names the ones it carries.
