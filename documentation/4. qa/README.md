@@ -74,4 +74,21 @@ Since RT3:
   declared status — `TestErrorsKeepTheirDeclaredStatus`,
   `TestListSimilaritiesOverHTTP` (RT7).
 
-Still to pin, with the rows that build them: the Postgres tier (RT9).
+- `Provision` migrates idempotently, writes the per-instance registry and
+  refuses another module's spec — `provision_test.go` (RT9).
+
+## The Postgres tier (RT9)
+
+`postgres_integration_test.go` runs only under `-tags=integration` with
+`POSTGRES_URL` set (`make test-pg`); without the variable it skips. It
+provisions the titles example at a random instance, drops its tables and
+registry on cleanup, and pins what SQLite cannot: `value` is `double
+precision`; the co-rated self-join, the top-K maintenance, `recommend`'s
+grouped division and the delete-below-floor path give the same figures as
+the sqlite tests. **As of 2026-10-11 it has never been run** — the backlog
+routine's environment has no Postgres — so the first `make test-pg` against
+a real cluster is still owed, and anything it finds is a bug to file on the
+board.
+
+Nothing else is left to pin from the built rows; RT8 (`Edges`) and RT11
+(the mount) will add theirs.

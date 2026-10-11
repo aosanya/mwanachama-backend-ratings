@@ -16,7 +16,7 @@ and are settled; the build rows on
 [documentation/3. implementation/todo.md](documentation/3.%20implementation/todo.md)
 run in dependency order. Do not resolve an open question by guessing; ask.
 
-## What is built (RT3–RT7, 2026-10-10 to 2026-10-11)
+## What is built (RT3–RT7 and RT9, 2026-10-10 to 2026-10-11)
 
 - `ratings.blueprint.json` declares three roles — `rating`, `similarity`,
   `setting` — embedded and reached through `Blueprint()`, `LoadSpec(path)`
@@ -74,6 +74,15 @@ run in dependency order. Do not resolve an open question by guessing; ask.
   Two wire facts: the fifth action is `ratings.recommendation.list`
   (`dispatch.ActionPattern` needs three segments), and a key in an address
   is percent-encoded because it carries slashes. The host mount is RT11.
+- `Provision(db, spec)` (RT9) is the whole storage story the host calls on
+  boot — `spec.Migrate`, refused for a spec of another module — and
+  `cmd/ddl <spec.json> [postgres|sqlite]` prints the same DDL for review or
+  for a deployment's own migration tooling. `postgres_integration_test.go`
+  (`//go:build integration`, `POSTGRES_URL`, `make test-pg`) provisions a
+  random instance, checks `value` lands as `double precision`, and runs the
+  self-join, top-K, `recommend` and the delete-below-floor path on real
+  Postgres. Written, compiled under the tag, **not run**: the routine's
+  environment has no Postgres.
 - `domain_agnostic_test.go` parses `models/`, `routes/` and the root
   package, every stored vocabulary and the blueprint, and fails on a domain
   word. The words include both example domains' nouns (`title`, `review`,
