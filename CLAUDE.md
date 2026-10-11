@@ -65,7 +65,10 @@ run in dependency order. Do not resolve an open question by guessing; ask.
   the rater has not rated, with the contributing neighbour count as
   `support`. Empty for a rater with no neighbours (#19); `n` defaults to 10,
   capped at 100. No centring and no minimum support: both would change the
-  decided query and are left for the owner with RT10's numbers.
+  decided query; RT10 was closed by the owner on 2026-10-11 without a
+  public-set run (the module is domain-agnostic, a deployment's own ratings
+  are the data), so the decided defaults stand and an instance tunes them
+  through its `setting` rows.
 - `ratings.operations.json` and `routes/` (RT7): the five operations of
   decision #17 through `mwanachama-backend-shared/dispatch`, REST and MCP
   from one file; `AnonymousActions` is empty and `TestNoRouteIsAnonymous`
@@ -83,13 +86,14 @@ run in dependency order. Do not resolve an open question by guessing; ask.
   self-join, top-K, `recommend` and the delete-below-floor path on real
   Postgres. Written, compiled under the tag, **not run**: the routine's
   environment has no Postgres.
-- `measure_*_test.go` (RT10's harness, 2026-10-11) runs RT2's protocol
-  under `//go:build measure`: `make measure` with `RATINGS_MEASURE_DIR`
-  naming the extracted ml-100k set loads every rating through `PutRating`
-  per grid cell and prints the grid, the baselines and the design page's
-  variant columns. Never part of `go test ./...`; proven on a synthetic set
-  only, because the environment the routine runs in cannot reach any host
-  that carries the data. See
+- `measure_*_test.go` (RT10, 2026-10-11) runs RT2's protocol under
+  `//go:build measure`: `make measure` with `RATINGS_MEASURE_DIR` naming a
+  directory holding `u.data` as `rater item value timestamp` rows on a
+  five-point scale loads every rating through `PutRating` per grid cell and
+  prints the grid, the baselines and the design page's variant columns.
+  Never part of `go test ./...`; proven on a synthetic set only. It is for
+  measuring a real instance's own exported ratings — RT10's public-set run
+  was closed by the owner as not needed. See
   [measurement-procedure.md](documentation/4.%20qa/measurement-procedure.md).
 - `domain_agnostic_test.go` parses `models/`, `routes/` and the root
   package, every stored vocabulary and the blueprint, and fails on a domain

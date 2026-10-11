@@ -1,4 +1,11 @@
-# Measurement procedure (RT2, run by RT10)
+# Measurement procedure (RT2)
+
+> **2026-10-11.** RT10 is closed without a public-set run (owner: the module
+> is domain-agnostic; a deployment's own ratings are the data). This
+> procedure stands for whoever wants to measure a real instance: export its
+> ratings as `rater item value timestamp` rows on a five-point scale into a
+> directory, and the steps below apply unchanged. Steps that name ml-100k
+> describe one example set.
 
 The step list for one measurement run. The reasoning is on
 [`2. design/measurement.md`](../2.%20design/measurement.md); this page is

@@ -1,5 +1,13 @@
 # Measuring recommendation quality (RT2)
 
+> **Status, 2026-10-11.** RT10 was closed by the owner without a public-set
+> run: the film set below was only ever an example, the module is
+> domain-agnostic, and the ratings that matter are each deployment's own.
+> The decided defaults stand and an instance tunes them through its
+> `setting` rows. The protocol on this page is still how to measure, and
+> the harness `make measure` runs it over any set exported in the four-column
+> form; ml-100k is one such set, not a requirement.
+
 The numbers the build rests on — the metric (#6), K (#13) and the overlap
 floor (#14) — are decided as defaults and promised to measurement. This page
 is the measurement: what is held out, what is predicted, what is scored, and
