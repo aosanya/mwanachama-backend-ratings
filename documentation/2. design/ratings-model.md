@@ -103,6 +103,51 @@ The work is bounded by one item's raters and by K, never by the catalog.
 Item-to-item, when the instance declares it, is the same three steps with
 rater and item swapped, keyed on the item's raters.
 
+### As built (RT5, 2026-10-11)
+
+`PutRating` validates through `Check`, inserts or replaces the one
+`(rater, item)` row, reads the instance's settings, and for each declared
+kind runs the step above. Steps 1 and 2 are one self-join (`sides.go`):
+
+```sql
+select b.rater as other, a.value as mine, b.value as theirs
+from   rating a join rating b on b.item = a.item
+where  a.rater = :r and b.rater <> :r
+  and  b.rater in (select rater from rating where item = :i)
+```
+
+It returns only co-rated value pairs for raters of `i`, grouped in Go by
+`other`; the metric runs in Go over those pairs (SQLite's build has no
+`sqrt`), so SQL does the join and nothing else. Jaccard alone needs each
+side's rating count, a second grouped query over the candidates. Item-to-item
+is the same query with the two columns swapped, which is what `sides` holds.
+Step 3 is `place`: an existing `(a, kind, b)` row is updated in place; a new
+one is inserted while fewer than K are held, else only if it beats the
+weakest, which is then deleted. A tie with the K-th does not displace it.
+
+`DeleteRating` deletes the row and then, per kind, re-scores the pairs the
+survey said a delete can break: the candidates are the raters of `i`
+(`sharing`); each is re-linked if still above the floor and with a positive
+score, else unlinked both ways. Every side a row left is **refreshed** —
+`refresh(kind, key)` recomputes that one key's top-K from scratch over
+everything it co-rated (the join without the `in` clause) and rewrites its
+rows. That is the bounded per-key recompute the survey asked for: it is how
+a candidate that was never stored under K enters when a stored neighbour
+leaves. A put never refreshes, because adding a rating cannot take a pair
+below the floor and a stored score falling is left where it is (the survey's
+first consequence, accepted as written).
+
+A cosine of 0 — orthogonal vectors or an all-zero side — is treated as "no
+similarity" and writes nothing, so every stored `score` is in (0, 1] for every
+metric. Nothing runs in a transaction, matching the siblings: a failure
+between the rating write and the similarity step leaves the rating in place
+and the next write on either side re-scores the pair.
+
+The invariant from #5 is pinned by `TestAWriteTouchesOnlyRatersOfThatItem`
+with a stepping clock: after a write on `w`, a similarity row is re-stamped
+only when both its keys rated `w`. A mutant that drops the `in` clause fails
+it on three rows.
+
 | Metric | Over co-rated items | Score |
 |--------|---------------------|-------|
 | `euclidean` | `sqrt(Σ (v_r − v_s)²)` | `1 / (1 + d)` |

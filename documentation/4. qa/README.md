@@ -40,9 +40,24 @@ Since RT3:
   `Check`, and a kind a domain declares is accepted — `validate_test.go`
   (RT4).
 
+- a rating write recomputes similarity only for raters sharing that item
+  (#5) — `TestAWriteTouchesOnlyRatersOfThatItem`, with a stepping clock so
+  an untouched row's `at` is exact; the mutant that recomputes every pair
+  fails it (RT5);
+- every metric scores in (0, 1] and a zero cosine writes nothing (#6) —
+  `metrics_test.go`, `TestCosineIsDirectionClampedToTheUnitInterval` (RT5);
+- a pair under the overlap floor is never linked, and a delete that takes
+  one under it removes both rows (#14) —
+  `TestAWriteLinksEachCoRaterAboveTheFloorBothWays`,
+  `TestADeleteBelowTheFloorRemovesThePairBothWays`; the off-by-one mutant
+  fails the second (RT5);
+- at most K rows per key and kind, the weakest displaced, and a shrunk set
+  refilled from candidates never stored (#13) —
+  `TestTopKIsMaintainedAndTheWeakestIsDisplaced`,
+  `TestADeleteRefreshesAShrunkSetFromCandidatesNeverStored` (RT5);
+- item-to-item runs only when the instance declares it (#12) —
+  `TestItemToItemRunsOnlyWhenTheInstanceDeclaresIt` (RT5).
+
 Still to pin, with the rows that build them:
 
-- a rating write recomputes similarity only for raters sharing that item
-  (#5) — RT5;
-- every score lands in (0, 1] for every metric (#6) — RT5;
 - `recommend` never returns an item the rater has rated (#9) — RT6.

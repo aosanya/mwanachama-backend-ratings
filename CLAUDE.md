@@ -16,7 +16,7 @@ and are settled; the build rows on
 [documentation/3. implementation/todo.md](documentation/3.%20implementation/todo.md)
 run in dependency order. Do not resolve an open question by guessing; ask.
 
-## What is built (RT3–RT4, 2026-10-10)
+## What is built (RT3–RT5, 2026-10-10 to 2026-10-11)
 
 - `ratings.blueprint.json` declares three roles — `rating`, `similarity`,
   `setting` — embedded and reached through `Blueprint()`, `LoadSpec(path)`
@@ -48,6 +48,18 @@ run in dependency order. Do not resolve an open question by guessing; ask.
   validation without a database. `patterns.go` holds the `matches` registry,
   empty until a field needs one; a spec naming a pattern nobody supplies is
   an error, not a rule that quietly never runs.
+- `rating.go`/`similarity.go`/`sides.go`/`metrics.go` (RT5): `PutRating`
+  (one row per `(rater, item)`, a repeat replaces it), `GetRating`,
+  `ListRatings` (by rater or item, never unscoped, capped at 500),
+  `DeleteRating`, `ListSimilarities`. Every write runs the incremental step
+  for each declared kind: one self-join fetches the co-rated value pairs for
+  the raters of that item only, the metric runs in Go, and `place` keeps at
+  most K rows per `(a, kind)`. A delete re-scores the pairs it can break and
+  **refreshes** any key whose set shrank, from scratch, bounded by that key's
+  own ratings. Mutation-checked: a write touches no row whose two keys did
+  not both rate the written item (`TestAWriteTouchesOnlyRatersOfThatItem`,
+  stepping clock). See the "As built" section of
+  [ratings-model.md](documentation/2.%20design/ratings-model.md).
 - `domain_agnostic_test.go` parses `models/`, `routes/` and the root
   package, every stored vocabulary and the blueprint, and fails on a domain
   word. The words include both example domains' nouns (`title`, `review`,

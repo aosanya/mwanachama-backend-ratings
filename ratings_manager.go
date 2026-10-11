@@ -29,6 +29,16 @@ const (
 )
 
 type RatingsManager interface {
+	PutRating(ctx context.Context, r Rating) (Rating, error)
+
+	GetRating(ctx context.Context, rater, item string) (Rating, error)
+
+	ListRatings(ctx context.Context, f RatingFilter) ([]Rating, error)
+
+	DeleteRating(ctx context.Context, rater, item string) error
+
+	ListSimilarities(ctx context.Context, f SimilarityFilter) ([]Similarity, error)
+
 	Settings(ctx context.Context) (Settings, error)
 
 	PutSetting(ctx context.Context, key, value string) (Setting, error)
