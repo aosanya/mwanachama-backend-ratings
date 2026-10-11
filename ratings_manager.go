@@ -39,6 +39,8 @@ type RatingsManager interface {
 
 	ListSimilarities(ctx context.Context, f SimilarityFilter) ([]Similarity, error)
 
+	Recommend(ctx context.Context, rater string, n int) ([]Recommendation, error)
+
 	Settings(ctx context.Context) (Settings, error)
 
 	PutSetting(ctx context.Context, key, value string) (Setting, error)

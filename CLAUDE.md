@@ -16,7 +16,7 @@ and are settled; the build rows on
 [documentation/3. implementation/todo.md](documentation/3.%20implementation/todo.md)
 run in dependency order. Do not resolve an open question by guessing; ask.
 
-## What is built (RT3–RT5, 2026-10-10 to 2026-10-11)
+## What is built (RT3–RT6, 2026-10-10 to 2026-10-11)
 
 - `ratings.blueprint.json` declares three roles — `rating`, `similarity`,
   `setting` — embedded and reached through `Blueprint()`, `LoadSpec(path)`
@@ -60,6 +60,12 @@ run in dependency order. Do not resolve an open question by guessing; ask.
   not both rate the written item (`TestAWriteTouchesOnlyRatersOfThatItem`,
   stepping clock). See the "As built" section of
   [ratings-model.md](documentation/2.%20design/ratings-model.md).
+- `recommend.go` (RT6): `Recommend(ctx, rater, n)` is decision #9's one
+  query over the K stored neighbours — `Σ score·value / Σ score` per item
+  the rater has not rated, with the contributing neighbour count as
+  `support`. Empty for a rater with no neighbours (#19); `n` defaults to 10,
+  capped at 100. No centring and no minimum support: both would change the
+  decided query and are left for the owner with RT10's numbers.
 - `domain_agnostic_test.go` parses `models/`, `routes/` and the root
   package, every stored vocabulary and the blueprint, and fails on a domain
   word. The words include both example domains' nouns (`title`, `review`,

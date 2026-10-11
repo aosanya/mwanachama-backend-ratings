@@ -58,6 +58,11 @@ Since RT3:
 - item-to-item runs only when the instance declares it (#12) —
   `TestItemToItemRunsOnlyWhenTheInstanceDeclaresIt` (RT5).
 
-Still to pin, with the rows that build them:
+- `recommend` never returns an item the rater has rated (#9) —
+  `TestRecommendNeverReturnsAnItemTheRaterHasRated`; the mutant that drops
+  the anti-join fails it (RT6);
+- a rater with no neighbours gets an empty list and no error (#19) —
+  `TestARaterWithNoNeighboursGetsAnEmptyListNotAnError` (RT6).
 
-- `recommend` never returns an item the rater has rated (#9) — RT6.
+Still to pin, with the rows that build them: the five operations through
+`dispatch` and `TestNoRouteIsAnonymous` (RT7); the Postgres tier (RT9).

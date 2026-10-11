@@ -188,6 +188,18 @@ One query over the K stored neighbours. The graph is not involved. A rater
 with no neighbours gets an empty list; a newcomer's fallback is the host's to
 compose (#19).
 
+### As built (RT6, 2026-10-11)
+
+`Recommend(ctx, rater, n)` is that query over the stored `kind = rater`
+rows, with `count(*) as support` beside the prediction so a reader can see
+how many neighbours stood behind each item; the ranking is unchanged by it.
+`n` defaults to 10 and is capped at 100. A rater with no neighbours, or no
+unrated item among them, gets an empty list and no error (#19). The RT1
+survey's points on centring and a minimum support are not built: both would
+change the query decision #9 states, so they stay raised for the owner and
+RT10's measurement. `TestRecommendNeverReturnsAnItemTheRaterHasRated` pins
+the anti-join; the mutant that drops it fails.
+
 ## The surface (decision #17)
 
 | Action | Method and path | Who |
