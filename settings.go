@@ -66,7 +66,7 @@ func (m *ratingsManager) apply(into *Settings, key, value string) error {
 	switch key {
 	case SettingMetric:
 		if err := m.declares(roleSimilarity, "metric", value); err != nil {
-			return err
+			return fmt.Errorf("%w: %v", ErrInvalidSetting, err)
 		}
 		into.Metric = Metric(value)
 	case SettingSimilarities:
@@ -98,7 +98,7 @@ func (m *ratingsManager) kinds(value string) ([]Kind, error) {
 	for _, part := range strings.Split(value, ",") {
 		part = strings.TrimSpace(part)
 		if err := m.declares(roleSimilarity, "kind", part); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: %v", ErrInvalidSetting, err)
 		}
 		out = append(out, Kind(part))
 	}
@@ -115,10 +115,9 @@ func (m *ratingsManager) declares(role, column, value string) error {
 				return nil
 			}
 		}
-		return fmt.Errorf("%w: %s is %q, which is not one of %s",
-			ErrInvalidSetting, column, value, strings.Join(f.Values, ", "))
+		return fmt.Errorf("%s is %q, which is not one of %s", column, value, strings.Join(f.Values, ", "))
 	}
-	return fmt.Errorf("%w: %s declares no field %q", ErrInvalidSetting, role, column)
+	return fmt.Errorf("%s declares no field %q", role, column)
 }
 
 func positive(key, value string) (int, error) {

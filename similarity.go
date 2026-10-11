@@ -3,6 +3,7 @@ package mwanachamaratings
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sort"
 	"time"
 
@@ -36,6 +37,9 @@ func (m *ratingsManager) ListSimilarities(ctx context.Context, f SimilarityFilte
 	}
 	if f.Kind == "" {
 		f.Kind = models.KindRater
+	}
+	if err := m.declares(roleSimilarity, "kind", string(f.Kind)); err != nil {
+		return nil, fmt.Errorf("%w: %v", ErrInvalidSimilarity, err)
 	}
 	if f.Limit <= 0 || f.Limit > models.MaxSimilarityListLimit {
 		f.Limit = models.MaxSimilarityListLimit

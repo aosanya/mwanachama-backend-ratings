@@ -16,7 +16,7 @@ and are settled; the build rows on
 [documentation/3. implementation/todo.md](documentation/3.%20implementation/todo.md)
 run in dependency order. Do not resolve an open question by guessing; ask.
 
-## What is built (RT3–RT6, 2026-10-10 to 2026-10-11)
+## What is built (RT3–RT7, 2026-10-10 to 2026-10-11)
 
 - `ratings.blueprint.json` declares three roles — `rating`, `similarity`,
   `setting` — embedded and reached through `Blueprint()`, `LoadSpec(path)`
@@ -66,6 +66,14 @@ run in dependency order. Do not resolve an open question by guessing; ask.
   `support`. Empty for a rater with no neighbours (#19); `n` defaults to 10,
   capped at 100. No centring and no minimum support: both would change the
   decided query and are left for the owner with RT10's numbers.
+- `ratings.operations.json` and `routes/` (RT7): the five operations of
+  decision #17 through `mwanachama-backend-shared/dispatch`, REST and MCP
+  from one file; `AnonymousActions` is empty and `TestNoRouteIsAnonymous`
+  pins it. The rater on `put`, `delete` and `recommend` is bound from the
+  mount's `Caller`, never the request, and is absent from the tool schemas.
+  Two wire facts: the fifth action is `ratings.recommendation.list`
+  (`dispatch.ActionPattern` needs three segments), and a key in an address
+  is percent-encoded because it carries slashes. The host mount is RT11.
 - `domain_agnostic_test.go` parses `models/`, `routes/` and the root
   package, every stored vocabulary and the blueprint, and fails on a domain
   word. The words include both example domains' nouns (`title`, `review`,

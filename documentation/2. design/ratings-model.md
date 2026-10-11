@@ -213,3 +213,37 @@ the anti-join; the mutant that drops it fails.
 All five come from `ratings.operations.json` through `dispatch`, so the MCP
 tools (`ratings_rating_put`, …) are the same table. `AnonymousActions` is
 empty. The host maps its caller to a rater key; a body never names the rater.
+
+### As built (RT7, 2026-10-11)
+
+`ratings.operations.json` sits beside the blueprint at the root, embedded and
+reached through `Operations()`; `routes/` is the adapter over
+`mwanachama-backend-shared/dispatch`, in catalog's shape: `RoutesFor`,
+`SplitFor`, `OperatorRoutesFor`, `ToolsFor`, each taking a `Mount` with the
+host's `Authorize` and `Caller`. Three things the build settled:
+
+- **The `recommend` action is `ratings.recommendation.list`, not
+  `ratings.recommend`.** The dispatcher holds every action id to
+  `module.object.verb` (`dispatch.ActionPattern`, at least two dots), and
+  refuses the two-segment form at load. The operation, path and tool
+  (`ratings_recommendation_list`) follow. Decision #17 carries a note; it is
+  one line to rename if the owner prefers another third segment.
+- **A key in an address is percent-encoded.** Keys carry slashes
+  (`catalog/cat1/x`), so `PUT /ratings/{item}` takes `catalog%2Fcat1%2Fx`:
+  Go's mux matches the escaped path and hands the wildcard back unescaped,
+  and an unencoded key is a 404. An MCP tool argument is a plain string and
+  is unaffected. Pinned in `routes_test.go`.
+- **The rater is the caller on `put`, `delete` and `recommend`.** `put`
+  binds `{from: caller, into: Rater}` over the whole body and
+  `{from: path, into: Item}`, so a body naming another rater or item is
+  overwritten, not refused; `delete` and `recommend` take the caller as a
+  positional argument. None of the three offers `rater` in its tool schema.
+  `list` may name a rater in its query, because reading is not acting in
+  someone's name. A mount that supplies no `Caller` binds `""`, which
+  `PutRating` refuses as a missing required field.
+
+`ListSimilarities` holds `kind` to the blueprint's enum (a `friend` is a 400),
+found when the route test asked for one. The five sentinels the module
+exports are all mapped to a status in the file's `errors` block, so none is
+redacted to a 500; `dispatch.UnmappedSentinels` over the root package is run
+by the test.

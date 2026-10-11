@@ -64,5 +64,14 @@ Since RT3:
 - a rater with no neighbours gets an empty list and no error (#19) —
   `TestARaterWithNoNeighboursGetsAnEmptyListNotAnError` (RT6).
 
-Still to pin, with the rows that build them: the five operations through
-`dispatch` and `TestNoRouteIsAnonymous` (RT7); the Postgres tier (RT9).
+- no route is anonymous and the five declared operations are the whole
+  surface (#17) — `routes/routes_test.go`: `TestNoRouteIsAnonymous`,
+  `TestTheFiveDeclaredOperationsAreTheWholeSurface`;
+- the rater is the caller, not the body, on `put`, `delete` and `recommend`,
+  and no tool offers it (#17) — `TestPutRatingTakesTheRaterFromTheCallerNotTheBody`,
+  `TestDeleteAndRecommendAreTheCallersOwn`, `TestTheRaterIsNotAToolArgument`;
+- a key in an address is percent-encoded and every sentinel keeps its
+  declared status — `TestErrorsKeepTheirDeclaredStatus`,
+  `TestListSimilaritiesOverHTTP` (RT7).
+
+Still to pin, with the rows that build them: the Postgres tier (RT9).
