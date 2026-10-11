@@ -110,7 +110,7 @@ run in dependency order. Do not resolve an open question by guessing; ask.
   through `mwanachama-backend-shared/spec` and `specstore`; no row structs,
   no `AutoMigrate`, no ArangoDB. `mwanachama-backend-catalog` is the shape
   to follow.
-- **A rater is any key, and so is an item.** Both are raw strings in the
+- **A rater is always an actor**, bound from the caller (requirements #20). **An item is any key.** Both are raw strings in the
   standard's form `<module>/<instance>/<identity>` (developer's
   `architecture-spec-driven-modules.md` §9), owned by other modules. This
   module stores them and never resolves what they mean.
