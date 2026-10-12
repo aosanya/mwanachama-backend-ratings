@@ -11,3 +11,5 @@ var ErrInvalidRating = errors.New("invalid rating")
 var ErrRatingNotFound = errors.New("rating not found")
 
 var ErrInvalidSimilarity = errors.New("invalid similarity")
+
+var ErrInvalidEdges = errors.New("invalid edges request")

@@ -90,5 +90,8 @@ routine's environment has no Postgres — so the first `make test-pg` against
 a real cluster is still owed, and anything it finds is a bug to file on the
 board.
 
-Nothing else is left to pin from the built rows; RT8 (`Edges`) and RT11
-(the mount) will add theirs.
+RT8's `Edges` (2026-10-12) is pinned in `edges_test.go`: the weight is the
+stored score, a pair named from both sides is one edge, an item similarity
+never travels, the call writes nothing, a malformed request is
+`ErrInvalidEdges`, and a key past the first 500-key query is still read —
+the last three mutation-checked. RT11 (the mount) will add its own.

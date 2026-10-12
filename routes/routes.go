@@ -22,6 +22,7 @@ var sentinels = map[string]error{
 	"ErrInvalidRating":     ratings.ErrInvalidRating,
 	"ErrInvalidSimilarity": ratings.ErrInvalidSimilarity,
 	"ErrInvalidSetting":    ratings.ErrInvalidSetting,
+	"ErrInvalidEdges":      ratings.ErrInvalidEdges,
 }
 
 var AnonymousActions = []string{}
