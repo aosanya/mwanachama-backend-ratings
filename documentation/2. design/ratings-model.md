@@ -206,8 +206,9 @@ either direction (#18).
 
 **Not built: `rated`.** #15 sends rater ▶ item edges only when the host's
 `context.<domain>.json` declares `rated`, but nothing says how the host tells
-this module so — ratings cannot read context's declaration (#18). Filed as
-RT12 for the owner. The default (#15: off) is what ships.
+this module so — ratings cannot read context's declaration (#18). The owner closed
+this as RT12 on 2026-10-12: there is no toggle, because ratings is wired to
+a catalog instance and context to wakala-api (#21).
 
 S59's `identity.Written` (shared, 2026-10-12) is the report a host sends a
 reacting module; `Edges` is not one — it is the extractor the host calls

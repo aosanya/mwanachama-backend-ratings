@@ -52,6 +52,7 @@ say so and the row is struck through.
 | 19 | **`recommend` returns what similarity supports and nothing else.** A rater with no neighbours gets an empty list; the fallback for a newcomer — "most rated this month" — is the host's to compose from the catalog or elsewhere. One notion of "good" per operation. If a host ever needs a popularity list from the data already here, it is a separate declared read, `ratings.popular`, filed then and not before. (RT-Q8, 2026-10-10) |
 
 | 20 | **A rating is always by an actor.** The rater is the caller, bound by the host (#17); there is no group rater and no rating on anyone's behalf. Similarity between raters is similarity between actors. A group's taste is not modelled; if it is ever wanted it is a new decision, not a reading of #4. (2026-10-11) |
+| 21 | **There is no `rated` toggle.** The owner, 2026-10-12, answering RT12: `mwanachama-backend-context` is wired to `mwanachama-wakala-api`, while ratings is wired to an instance of `mwanachama-backend-catalog` — so no host declares `rated` toward context, and RT12's question (how the host switches `rated` edges on) does not arise. What this means for #8, #15, #18 and the shipped `Edges` (RT8) is asked of the owner next, not assumed here. (2026-10-12) |
 
 ## Open questions for the owner
 

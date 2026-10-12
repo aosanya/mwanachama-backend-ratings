@@ -99,8 +99,7 @@ run in dependency order. Do not resolve an open question by guessing; ask.
   stored rater-to-rater similarities of the named keys and returns
   `similar_taste` `Edge{from, to, predicate, weight = score}` — one read per
   500 keys, nothing written, a symmetric pair emitted once, item
-  similarities never. The host maps each to context's `Fact` (#18); `rated`
-  edges (#15) are not built and wait on RT12.
+  similarities never. The host maps each to context's `Fact` (#18).
 - `domain_agnostic_test.go` parses `models/`, `routes/` and the root
   package, every stored vocabulary and the blueprint, and fails on a domain
   word. The words include both example domains' nouns (`title`, `review`,
