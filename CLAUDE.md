@@ -125,7 +125,9 @@ run in dependency order. Do not resolve an open question by guessing; ask.
 - **It feeds nothing.** It never sends anything to
   `mwanachama-backend-context`, never touches ArangoDB and triggers nothing
   (requirements #18, #22). It is attached to a catalog instance in that
-  catalog's config file (#23); the mechanism is not built yet (RT11).
+  catalog's config file (#23) through shared's `spec.Spec.Attach` —
+  `"attach": [{"module": "ratings", "items": "catalog.entry"}]`; the
+  host mounting it is RT11.
 - **It names no domain.** Not "movie", not "member", not "user" — `rater`
   and `item`. `domain_agnostic_test.go` enforces it over identifiers, the
   blueprint and every stored enum value, as the siblings do.
