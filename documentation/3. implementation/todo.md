@@ -24,4 +24,4 @@ None open. RT1 and RT2 are in `todo_done.md`.
 
 | Task | Title | Depends on | Notes |
 |------|-------|------------|-------|
-| RT11 | ⏸️ **Mount in `mwanachama-wakala-api`** | RT7 ✅ | Cross-repo. `RATINGS_INSTANCE` → `SpecFor`, provisioned on boot, mounted beside the other declared domains per that repo's decision #22; the caller→rater mapping. Nothing toward context (this repo's requirements #22): ratings is mounted with a catalog instance. |
+| RT11 | ⏸️ **Attach ratings to a catalog instance through the catalog's config file** | RT7 ✅, the attachment shape | Requirements #23 (the owner, 2026-10-12): ratings is attached in a catalog domain spec, not mounted on its own by `RATINGS_INSTANCE`. No mechanism exists — `spec.Spec` decodes with unknown fields refused — so the shape is being asked of the owner. Still carried from the first draft: the caller→rater mapping (#20). Nothing toward context (#22). |
