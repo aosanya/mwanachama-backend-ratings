@@ -5,9 +5,8 @@ from many such values the module computes how alike two raters are — or two
 items — by a declared metric. A rater is always an actor. An item is any key. The module never knows what either is.
 
 It answers "what would this rater rate highly" on its own, by SQL, and feeds
-`similar_taste` edges into
-[mwanachama-backend-context](../mwanachama-backend-context) so a walk there
-can blend taste with everything else that graph holds.
+nothing else — it is completely separate from
+[mwanachama-backend-context](../mwanachama-backend-context) (decision #22).
 
 Split out of `mwanachama-backend-context` on 2026-10-10 (its decision #61).
 The blueprint, two domain specs, the models and the manager constructor are

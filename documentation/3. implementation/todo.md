@@ -24,4 +24,4 @@ None open. RT1 and RT2 are in `todo_done.md`.
 
 | Task | Title | Depends on | Notes |
 |------|-------|------------|-------|
-| RT11 | ⏸️ **Mount in `mwanachama-wakala-api`** | RT7 ✅, RT8 ✅ | Cross-repo. `RATINGS_INSTANCE` → `SpecFor`, provisioned on boot, mounted beside the other declared domains per that repo's decision #22; the caller→rater mapping; the batched reindex trigger toward context (#18): per-pod pending set, flush at ~30 s or N raters. Ready for it (2026-10-12): `Edges` (RT8) and shared's S59 (`identity.Written`, the report a host sends a reacting module) both landed; what is left is wakala-api's mount, which is not this routine's repo. |
+| RT11 | ⏸️ **Mount in `mwanachama-wakala-api`** | RT7 ✅ | Cross-repo. `RATINGS_INSTANCE` → `SpecFor`, provisioned on boot, mounted beside the other declared domains per that repo's decision #22; the caller→rater mapping. Nothing toward context (this repo's requirements #22): ratings is mounted with a catalog instance. |

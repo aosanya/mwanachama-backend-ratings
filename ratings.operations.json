@@ -132,7 +132,6 @@
     "ErrSettingNotFound": 404,
     "ErrInvalidRating": 400,
     "ErrInvalidSimilarity": 400,
-    "ErrInvalidSetting": 400,
-    "ErrInvalidEdges": 400
+    "ErrInvalidSetting": 400
   }
 }

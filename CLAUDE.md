@@ -95,11 +95,9 @@ run in dependency order. Do not resolve an open question by guessing; ask.
   measuring a real instance's own exported ratings — RT10's public-set run
   was closed by the owner as not needed. See
   [measurement-procedure.md](documentation/4.%20qa/measurement-procedure.md).
-- `edges.go` (RT8, 2026-10-12): `Edges(ctx, partition, keys)` reads the
-  stored rater-to-rater similarities of the named keys and returns
-  `similar_taste` `Edge{from, to, predicate, weight = score}` — one read per
-  500 keys, nothing written, a symmetric pair emitted once, item
-  similarities never. The host maps each to context's `Fact` (#18).
+- **Nothing goes to context** (requirements #22, 2026-10-12): ratings and
+  `mwanachama-backend-context` are completely separate. RT8's `Edges` was
+  built and deleted the same day.
 - `domain_agnostic_test.go` parses `models/`, `routes/` and the root
   package, every stored vocabulary and the blueprint, and fails on a domain
   word. The words include both example domains' nouns (`title`, `review`,
@@ -110,7 +108,7 @@ run in dependency order. Do not resolve an open question by guessing; ask.
 - **Split out of `mwanachama-backend-context` on 2026-10-10.** That module
   holds weighted edges between keys and knows nothing about what it maps; a
   ratings matrix is tabular and similarity is a join plus a sum, which is
-  SQL's job. Two repos, one contract between them.
+  SQL's job. Two repos, and no contract between them (#22).
 - **Postgres, declared domain, like every sibling** — `ratings.blueprint.json`
   through `mwanachama-backend-shared/spec` and `specstore`; no row structs,
   no `AutoMigrate`, no ArangoDB. `mwanachama-backend-catalog` is the shape
@@ -124,11 +122,9 @@ run in dependency order. Do not resolve an open question by guessing; ask.
   requirement, not a nicety.
 - **The metric is declared**, from a closed set the module supplies:
   `euclidean` (asked for first), `cosine`, `jaccard`.
-- **Toward `mwanachama-backend-context` it is an extractor**: on that
-  module's `reindex` it emits `similar_taste` edges with `weight = score`,
-  through one library call, `Edges`. It imports nothing from context, never
-  touches ArangoDB, and triggers nothing — the host batches and calls the
-  reindex (requirements #18).
+- **It feeds nothing.** It never sends anything to
+  `mwanachama-backend-context`, never touches ArangoDB and triggers nothing
+  (requirements #18, #22). It is mounted with a catalog instance.
 - **It names no domain.** Not "movie", not "member", not "user" — `rater`
   and `item`. `domain_agnostic_test.go` enforces it over identifiers, the
   blueprint and every stored enum value, as the siblings do.

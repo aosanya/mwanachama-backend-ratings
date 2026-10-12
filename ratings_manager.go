@@ -41,8 +41,6 @@ type RatingsManager interface {
 
 	Recommend(ctx context.Context, rater string, n int) ([]Recommendation, error)
 
-	Edges(ctx context.Context, partition string, keys []string) ([]Edge, error)
-
 	Settings(ctx context.Context) (Settings, error)
 
 	PutSetting(ctx context.Context, key, value string) (Setting, error)

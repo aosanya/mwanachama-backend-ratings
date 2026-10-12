@@ -154,66 +154,18 @@ it on three rows.
 | `cosine` | `Σ v_r·v_s / (‖v_r‖·‖v_s‖)` | the cosine itself, clamped to [0, 1] |
 | `jaccard` | `|both rated| / |either rated|` — ignores values, for thumbs-only scales | the ratio |
 
-## The contract with `mwanachama-backend-context` (decisions #8, #15)
+## No contract with `mwanachama-backend-context` (decision #22)
 
-```
-context.reindex(partition, "ratings", [keys])
-  → this module, as extractor, appends for each key:
-      similar_taste  a ── b   weight = score   source = extractor:ratings      always
-      rated          r ──▶ i  weight = value   source = extractor:ratings      only if the host
-                                                                             declared `rated`
-```
-
-`similar_taste` is declared by the host in its `context.<domain>.json`; this
-module supplies the edges, context supplies the walk. The module exposes one
-library call for it, `Edges(ctx, partition, keys) ([]Edge, error)`, which the
-host's reindex adapter calls; it is not a declared operation. The host batches
-rater keys after writes and flushes a reindex every ~30 s or N raters, from
-per-pod memory — safe because a reindex is idempotent (#18). This module has
-no connection to ArangoDB and no import of context.
-
-### As built (RT8, 2026-10-12)
-
-`Edges(ctx, partition, keys) ([]Edge, error)` is on `RatingsManager`, in
-`edges.go`. `Edge{From, To, Predicate, Weight}` (JSON `from`/`to`/
-`predicate`/`weight`) is this module's own type, field for field what
-context's `Fact` carries, so the host maps one to the other with no import in
-either direction (#18).
-
-- **One read, no write.** The stored `kind = rater` similarity rows whose `a`
-  is a named key, in one `a in (…)` query per 500 keys — a host flushing a
-  large pending set is chunked, never refused. Nothing is recomputed: the
-  incremental step on every rating write (RT5) already holds each rater's K
-  neighbours, so a reindex costs one indexed read per batch.
-- **`similar_taste` only, rater to rater.** An item similarity (when an
-  instance turned `similarities` on for items) never travels — #8 names
-  taste between raters, and nothing decided an item predicate.
-- **A pair is one edge.** `link` writes a pair both ways at one score, and
-  context stores a symmetric predicate once per ordered pair (#46 there), so a
-  pair named from both sides, or reached from both, is emitted once, from the
-  lower key. Edges are ordered by `From`, then strongest first.
-- **`Weight` is the stored score**, in (0, 1] by the similarity row's own
-  rule, which is the range context's weight accepts. Context uses it on
-  insert only (its #33).
-- **`partition` is checked, not read.** It is held to
-  `identity.SegmentPattern` so a malformed one stops here, but one ratings
-  manager is one instance and owns no partition; the host passes the one it
-  will hand to context's `Reindex`, the signature #18 decided.
-- Duplicate keys collapse; an empty key or a malformed partition is
-  `ErrInvalidEdges` (400 on the declared map, though no route calls it —
-  `Edges` is a library call, not an operation). A rater with no neighbours,
-  or a key nobody rated, is no edges and no error.
-
-**Not built: `rated`.** #15 sends rater ▶ item edges only when the host's
-`context.<domain>.json` declares `rated`, but nothing says how the host tells
-this module so — ratings cannot read context's declaration (#18). The owner closed
-this as RT12 on 2026-10-12: there is no toggle, because ratings is wired to
-a catalog instance and context to wakala-api (#21).
-
-S59's `identity.Written` (shared, 2026-10-12) is the report a host sends a
-reacting module; `Edges` is not one — it is the extractor the host calls
-while acting on a `Written{owner: "ratings", …}` of its own, with the raters
-it collected (#18's pending set).
+Decisions #8 and #15 once made this module an extractor toward context —
+`similar_taste` edges between raters at `weight = score`, through a library
+call `Edges` the host would batch into context's `reindex`. The owner
+superseded both on 2026-10-12: the two modules are completely separate.
+Ratings is mounted with a catalog instance, context with wakala-api (#21),
+and nothing of either ever reaches the other. `Edges` (RT8) was built that
+morning and deleted the same day; RT12 (how a host would switch `rated` on)
+was closed as a false premise. What remains true from that contract is only
+what was always true of this module alone: no ArangoDB, no import of
+context, nothing triggered.
 
 ## `recommend(rater, n)` without the graph (decision #9)
 
